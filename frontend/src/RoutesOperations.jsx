@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react'
 import logo from './assets/logo.png'
 
-export default function Routes() {
+const API_BASE_URL = 'http://localhost:3000/api'
+
+export default function RoutesOperations() {
   const [selectedCity, setSelectedCity] = useState('pune')
   const [festivalMode, setFestivalMode] = useState(false)
   const [user, setUser] = useState(null)
+  const [routesData, setRoutesData] = useState(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
@@ -13,130 +17,45 @@ export default function Routes() {
     }
   }, [])
 
-  // Route data based on city and festival mode
-  const routeData = {
-    pune: {
-      name: 'Pune',
-      trucks: [
+  useEffect(() => {
+    fetchRoutes()
+  }, [selectedCity, festivalMode])
+
+  const fetchRoutes = async () => {
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(
+        `${API_BASE_URL}/routes/${selectedCity}?festival=${festivalMode}`,
         {
-          id: 1,
-          name: 'Truck 1',
-          zone: 'Market Zone',
-          color: 'from-blue-400 to-blue-600',
-          bins: [
-            { id: 101, location: 'Market Street (High St)', fillLevel: 95, priority: 'critical' },
-            { id: 102, location: 'Commercial Hub', fillLevel: 88, priority: 'high' },
-            { id: 103, location: 'Shopping District', fillLevel: 82, priority: 'high' },
-          ],
-          distance: '12.5 km',
-          estimatedTime: '45 mins',
-          stops: 3,
-        },
-        {
-          id: 2,
-          name: 'Truck 2',
-          zone: 'Residential Zone',
-          color: 'from-emerald-400 to-emerald-600',
-          bins: [
-            { id: 201, location: 'Residential Area A', fillLevel: 65, priority: 'medium' },
-            { id: 202, location: 'Residential Area B', fillLevel: 58, priority: 'low' },
-            { id: 203, location: 'Park Road', fillLevel: 45, priority: 'low' },
-          ],
-          distance: '8.3 km',
-          estimatedTime: '35 mins',
-          stops: 3,
-        },
-      ],
-      explanation: 'Route optimization prioritizes Market Zone bins which have higher fill levels due to increased commercial activity. Residential areas with lower accumulation are scheduled for lower priority to maximize collection efficiency.',
-    },
-    indore: {
-      name: 'Indore',
-      trucks: [
-        {
-          id: 1,
-          name: 'Truck 1',
-          zone: 'Commercial Zone',
-          color: 'from-purple-400 to-purple-600',
-          bins: [
-            { id: 104, location: 'Commercial Hub', fillLevel: 92, priority: 'critical' },
-            { id: 105, location: 'Business District', fillLevel: 86, priority: 'high' },
-            { id: 106, location: 'Trade Center', fillLevel: 79, priority: 'high' },
-          ],
-          distance: '10.2 km',
-          estimatedTime: '40 mins',
-          stops: 3,
-        },
-        {
-          id: 2,
-          name: 'Truck 2',
-          zone: 'Industrial Zone',
-          color: 'from-amber-400 to-amber-600',
-          bins: [
-            { id: 207, location: 'Industrial Park A', fillLevel: 88, priority: 'high' },
-            { id: 208, location: 'Factory District', fillLevel: 75, priority: 'medium' },
-            { id: 209, location: 'Warehouse Area', fillLevel: 62, priority: 'medium' },
-          ],
-          distance: '14.7 km',
-          estimatedTime: '50 mins',
-          stops: 3,
-        },
-      ],
-      explanation: 'Industrial zone receives priority due to consistent high waste generation. Commercial areas are scheduled for peak efficiency. Route planning avoids congested areas during business hours.',
-    },
-    surat: {
-      name: 'Surat',
-      trucks: [
-        {
-          id: 1,
-          name: 'Truck 1',
-          zone: 'Textile District',
-          color: 'from-red-400 to-red-600',
-          bins: [
-            { id: 301, location: 'Textile Mills Area', fillLevel: 93, priority: 'critical' },
-            { id: 302, location: 'Garment District', fillLevel: 87, priority: 'high' },
-            { id: 303, location: 'Fabric Market', fillLevel: 81, priority: 'high' },
-          ],
-          distance: '11.8 km',
-          estimatedTime: '42 mins',
-          stops: 3,
-        },
-        {
-          id: 2,
-          name: 'Truck 2',
-          zone: 'Residential Zone',
-          color: 'from-cyan-400 to-cyan-600',
-          bins: [
-            { id: 304, location: 'Coastal Residential', fillLevel: 71, priority: 'medium' },
-            { id: 305, location: 'Suburban Area', fillLevel: 59, priority: 'medium' },
-            { id: 306, location: 'Housing Complex', fillLevel: 52, priority: 'low' },
-          ],
-          distance: '9.4 km',
-          estimatedTime: '38 mins',
-          stops: 3,
-        },
-      ],
-      explanation: 'Textile industry generates significant waste requiring priority scheduling. Coastal residential areas have moderate accumulation. Route timing avoids peak traffic in mill districts.',
-    },
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      )
+      const data = await response.json()
+      if (data.success) {
+        setRoutesData(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching routes:', error)
+    }
+    setLoading(false)
   }
 
-  const currentRoute = routeData[selectedCity]
-  
-  // Adjust trucks if festival mode is on
-  const activeTrucks = festivalMode 
-    ? [...currentRoute.trucks, {
-        id: 3,
-        name: 'Truck 3 (Festival)',
-        zone: 'Festival Support',
-        color: 'from-pink-400 to-pink-600',
-        bins: [
-          { id: 401, location: 'Event Venue Area', fillLevel: 98, priority: 'critical' },
-          { id: 402, location: 'Parking Areas', fillLevel: 91, priority: 'critical' },
-        ],
-        distance: '6.5 km',
-        estimatedTime: '25 mins',
-        stops: 2,
-      }]
-    : currentRoute.trucks
+  if (loading || !routesData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+          <p className="mt-4 text-gray-600">Loading routes...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const currentRoute = routesData
+  const activeTrucks = currentRoute.trucks
 
   const getPriorityColor = (priority) => {
     switch(priority) {
@@ -153,11 +72,8 @@ export default function Routes() {
       return sum + parseFloat(truck.distance)
     }, 0)
     const totalStops = activeTrucks.reduce((sum, truck) => sum + truck.stops, 0)
-    const avgTime = Math.ceil(activeTrucks.reduce((sum, truck) => {
-      return sum + parseInt(truck.estimatedTime)
-    }, 0) / activeTrucks.length)
 
-    return { totalDistance: totalDistance.toFixed(1), totalStops, avgTime }
+    return { totalDistance: totalDistance.toFixed(1), totalStops }
   }
 
   const stats = getTotalStats()
@@ -345,7 +261,7 @@ export default function Routes() {
             <div className="flex-1">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Route Intelligence</h3>
               <div className="space-y-4 text-gray-700">
-                <div className="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded">
+              <div className={`bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded`}>
                   <p className="font-semibold text-emerald-900 mb-2">Smart Route Optimization</p>
                   <p className="text-sm">
                     {currentRoute.explanation}

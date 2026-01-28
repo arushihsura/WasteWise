@@ -1,10 +1,20 @@
 import { useState, useEffect } from 'react'
 import logo from './assets/logo.png'
 
+const API_BASE_URL = 'http://localhost:3000/api'
+
 export default function Dashboard() {
   const [selectedCity, setSelectedCity] = useState('pune')
   const [festivalMode, setFestivalMode] = useState(false)
   const [user, setUser] = useState(null)
+  const [dashboardData, setDashboardData] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const cities = {
+    pune: { name: 'Pune' },
+    indore: { name: 'Indore' },
+    surat: { name: 'Surat' },
+  }
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
@@ -13,35 +23,42 @@ export default function Dashboard() {
     }
   }, [])
 
-  const cities = {
-    pune: {
-      name: 'Pune',
-      totalBins: 2450,
-      binsAtRisk: 340,
-      trucksRequired: 18,
-      festivalImpact: 1.6,
-      zones: ['Market', 'Residential'],
-    },
-    indore: {
-      name: 'Indore',
-      totalBins: 1890,
-      binsAtRisk: 215,
-      trucksRequired: 14,
-      festivalImpact: 1.4,
-      zones: ['Commercial', 'Industrial'],
-    },
-    surat: {
-      name: 'Surat',
-      totalBins: 2100,
-      binsAtRisk: 280,
-      trucksRequired: 16,
-      festivalImpact: 1.8,
-      zones: ['Textile', 'Residential'],
-    },
+  useEffect(() => {
+    fetchDashboardStats()
+  }, [selectedCity])
+
+  const fetchDashboardStats = async () => {
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${API_BASE_URL}/dashboard/${selectedCity}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+      const data = await response.json()
+      if (data.success) {
+        setDashboardData(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error)
+    }
+    setLoading(false)
   }
 
-  const currentCity = cities[selectedCity]
+  if (loading || !dashboardData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    )
+  }
 
+  const currentCity = dashboardData
+  
   const stats = [
     {
       label: 'Total Bins',
@@ -63,7 +80,7 @@ export default function Dashboard() {
     },
     {
       label: 'Efficiency Rate',
-      value: '94%',
+      value: currentCity.efficiency + '%',
       icon: '📈',
       color: 'from-purple-400 to-purple-600',
     },
