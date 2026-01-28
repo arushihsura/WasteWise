@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import logo from './assets/logo.png'
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -33,19 +34,51 @@ export default function SignUp() {
       return
     }
 
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters')
+      return
+    }
+
     setLoading(true)
 
     try {
-      // TODO: Replace with actual API call
-      console.log('Sign up:', formData)
-      setTimeout(() => {
-        setLoading(false)
-        // navigate('/signin')
-      }, 1500)
+      const response = await fetch('http://localhost:3000/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          role: formData.role,
+          department: formData.department,
+          password: formData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        setError(data.error || 'Sign up failed');
+        setLoading(false);
+        return;
+      }
+
+      // Store token and user data
+      localStorage.setItem('token', data.data.token);
+      localStorage.setItem('user', JSON.stringify(data.data.user));
+      
+      alert('Account created successfully!');
+      console.log('User:', data.data.user);
+      
+      // Navigate to sign in or dashboard
+      navigate('/signin');
+      
+      setLoading(false);
     } catch (error) {
-      console.error('Sign up error:', error)
-      setError('An error occurred. Please try again.')
-      setLoading(false)
+      console.error('Sign up error:', error);
+      setError('An error occurred. Please try again.');
+      setLoading(false);
     }
   }
 
@@ -54,6 +87,9 @@ export default function SignUp() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <img src={logo} alt="WasteWise Logo" className="w-20 h-20 object-contain" />
+          </div>
           <h1 className="text-4xl font-bold text-primary-green mb-2">WasteWise</h1>
           <p className="text-gray-600">Smart Waste Management System</p>
         </div>
