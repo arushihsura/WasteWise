@@ -52,8 +52,12 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`
+const startServer = async () => {
+  try {
+    await connectDB();
+    
+    app.listen(PORT, () => {
+      console.log(`
 ╔═══════════════════════════════════════╗
 ║      WasteWise API Server             ║
 ╠═══════════════════════════════════════╣
@@ -61,5 +65,12 @@ app.listen(PORT, () => {
 ║  Port:        ${PORT.toString().padEnd(24)}║
 ║  URL:         http://localhost:${PORT}    ║
 ╚═══════════════════════════════════════╝
-  `);
-});
+      `);
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
