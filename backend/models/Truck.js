@@ -13,7 +13,7 @@ const truckSchema = new mongoose.Schema(
     city: {
       type: String,
       required: true,
-      enum: ['pune', 'indore', 'surat'],
+      enum: ['navimumbai', 'indore', 'surat'],
     },
     zone: {
       type: String,

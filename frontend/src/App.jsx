@@ -7,6 +7,7 @@ import RoutesOperations from './RoutesOperations'
 import SupervisorMonitor from './pages/SupervisorMonitor'
 import AIInsights from './pages/AIInsights'
 import AnalyticsImpact from './pages/AnalyticsImpact'
+import RouteMap from './pages/RouteMap'
 import './index.css'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/supervisor-monitor" element={<SupervisorMonitor />} />
         <Route path="/ai-insights" element={<AIInsights />} />
         <Route path="/analytics-impact" element={<AnalyticsImpact />} />
+        <Route path="/route-map" element={<RouteMap />} />
       </Routes>
     </Router>
   )

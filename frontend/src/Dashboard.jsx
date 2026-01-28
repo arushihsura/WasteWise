@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import logo from './assets/logo.png'
 
 const API_BASE_URL = 'http://localhost:3000/api'
 
 export default function Dashboard() {
-  const [selectedCity, setSelectedCity] = useState('pune')
+  const navigate = useNavigate()
+  const [selectedCity, setSelectedCity] = useState('navimumbai')
   const [festivalMode, setFestivalMode] = useState(false)
   const [user, setUser] = useState(null)
   const [dashboardData, setDashboardData] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const cities = {
-    pune: { name: 'Pune' },
+    navimumbai: { name: 'Navi Mumbai' },
     indore: { name: 'Indore' },
     surat: { name: 'Surat' },
   }
@@ -90,27 +92,69 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <img src={logo} alt="WasteWise Logo" className="w-10 h-10 object-contain" />
-            <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
-                WasteWise
-              </h1>
-              <p className="text-xs text-gray-500">Dashboard</p>
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <img src={logo} alt="WasteWise Logo" className="w-10 h-10 object-contain" />
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+                  WasteWise
+                </h1>
+                <p className="text-xs text-gray-500">Dashboard</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900 capitalize">
+                  {user?.fullName || 'User'}
+                </p>
+                <p className="text-xs text-gray-500 capitalize">{user?.role || 'Role'}</p>
+              </div>
+              <button className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full text-white font-semibold text-sm flex items-center justify-center hover:shadow-lg transition-shadow">
+                {user?.fullName?.charAt(0) || 'U'}
+              </button>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900 capitalize">
-                {user?.fullName || 'User'}
-              </p>
-              <p className="text-xs text-gray-500 capitalize">{user?.role || 'Role'}</p>
-            </div>
-            <button className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full text-white font-semibold text-sm flex items-center justify-center hover:shadow-lg transition-shadow">
-              {user?.fullName?.charAt(0) || 'U'}
+          
+          {/* Navigation Menu */}
+          <nav className="flex items-center gap-2 overflow-x-auto pb-2">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="px-4 py-2 rounded-lg font-medium text-sm bg-emerald-100 text-emerald-700 whitespace-nowrap"
+            >
+              🏠 Dashboard
             </button>
-          </div>
+            <button
+              onClick={() => navigate('/routes')}
+              className="px-4 py-2 rounded-lg font-medium text-sm hover:bg-gray-100 text-gray-700 whitespace-nowrap transition-colors"
+            >
+              🚛 Routes
+            </button>
+            <button
+              onClick={() => navigate('/supervisor-monitor')}
+              className="px-4 py-2 rounded-lg font-medium text-sm hover:bg-gray-100 text-gray-700 whitespace-nowrap transition-colors"
+            >
+              👁️ Monitor
+            </button>
+            <button
+              onClick={() => navigate('/analytics-impact')}
+              className="px-4 py-2 rounded-lg font-medium text-sm hover:bg-gray-100 text-gray-700 whitespace-nowrap transition-colors"
+            >
+              📊 Analytics
+            </button>
+            <button
+              onClick={() => navigate('/ai-insights')}
+              className="px-4 py-2 rounded-lg font-medium text-sm hover:bg-gray-100 text-gray-700 whitespace-nowrap transition-colors"
+            >
+              🤖 AI Insights
+            </button>
+            <button
+              onClick={() => navigate('/route-map')}
+              className="px-4 py-2 rounded-lg font-medium text-sm hover:bg-gray-100 text-gray-700 whitespace-nowrap transition-colors"
+            >
+              🗺️ Map
+            </button>
+          </nav>
         </div>
       </header>
 
@@ -220,6 +264,137 @@ export default function Dashboard() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Feature Navigation Cards */}
+        <div className="mb-8">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">🚀 Advanced Features</h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            {/* Routes & Operations Card */}
+            <div 
+              onClick={() => navigate('/routes')}
+              className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl shadow-xl p-6 text-white cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-2xl">🚛</span>
+                </div>
+                <svg className="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold mb-2">Routes & Operations</h4>
+              <p className="text-xs opacity-90 mb-3">
+                Manage truck routes and optimize collection operations
+              </p>
+              <div className="flex items-center gap-2 text-xs font-semibold">
+                <span>Manage Routes</span>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Supervisor Monitor Card */}
+            <div 
+              onClick={() => navigate('/supervisor-monitor')}
+              className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl shadow-xl p-6 text-white cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-2xl">👁️</span>
+                </div>
+                <svg className="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold mb-2">Supervisor Monitor</h4>
+              <p className="text-xs opacity-90 mb-3">
+                Real-time monitoring of priority bins and collection status
+              </p>
+              <div className="flex items-center gap-2 text-xs font-semibold">
+                <span>View Monitor</span>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Analytics Card */}
+            <div 
+              onClick={() => navigate('/analytics-impact')}
+              className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-xl p-6 text-white cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-2xl">📊</span>
+                </div>
+                <svg className="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold mb-2">Analytics & Impact</h4>
+              <p className="text-xs opacity-90 mb-3">
+                View detailed performance metrics, charts, and zone-wise analysis
+              </p>
+              <div className="flex items-center gap-2 text-xs font-semibold">
+                <span>Explore Analytics</span>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </div>
+            </div>
+
+            {/* AI Insights Card */}
+            <div 
+              onClick={() => navigate('/ai-insights')}
+              className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl shadow-xl p-6 text-white cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-2xl">🤖</span>
+                </div>
+                <svg className="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold mb-2">AI Insights</h4>
+              <p className="text-xs opacity-90 mb-3">
+                Get intelligent recommendations and chat with AI assistant
+              </p>
+              <div className="flex items-center gap-2 text-xs font-semibold">
+                <span>Chat with AI</span>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Route Map Card */}
+            <div 
+              onClick={() => navigate('/route-map')}
+              className="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl shadow-xl p-6 text-white cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-2xl">🗺️</span>
+                </div>
+                <svg className="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+              <h4 className="text-lg font-bold mb-2">Route Map</h4>
+              <p className="text-xs opacity-90 mb-3">
+                View interactive map with optimized collection routes
+              </p>
+              <div className="flex items-center gap-2 text-xs font-semibold">
+                <span>View Routes</span>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
 

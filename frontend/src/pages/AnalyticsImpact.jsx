@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TrendingUp,
   DollarSign,
@@ -11,7 +11,8 @@ import {
   Download,
   MapPin,
   Target,
-  Calendar
+  Calendar,
+  Sparkles
 } from 'lucide-react';
 import {
   LineChart,
@@ -27,11 +28,19 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import logo from '../assets/logo.png';
 
 const AnalyticsImpact = () => {
   const [timeRange, setTimeRange] = useState('month');
   const [selectedZone, setSelectedZone] = useState('all');
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   // Dummy Data
   const [wasteTrendData] = useState([
@@ -81,52 +90,40 @@ const AnalyticsImpact = () => {
   });
 
   const handleExport = () => {
-    // Simulate export functionality
     alert(`Exporting ${timeRange} report...`);
-    console.log('Export data:', { 
-      wasteTrendData, 
-      costComparisonData, 
-      zonePerformanceData, 
-      emissionsData, 
-      impactMetrics 
-    });
-  };
-
-  const COLORS = {
-    primary: '#2D5016',
-    secondary: '#4A7C2C',
-    accent: '#8FBC8F',
-    beige: '#F5E6D3',
-    beigeLight: '#FAF3E8',
-    warning: '#D4A574',
-    danger: '#C65D3B',
-    success: '#6B8E23'
   };
 
   const MetricCard = ({ icon: Icon, title, value, change, changeType, suffix = '' }) => (
-    <div className="bg-white rounded-xl shadow-md p-6 border-l-4 hover:shadow-lg transition-shadow"
-         style={{ borderLeftColor: COLORS.primary }}>
+    <div className="bg-white rounded-2xl shadow-lg p-6 border border-emerald-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <Icon size={20} style={{ color: COLORS.secondary }} />
-            <p className="text-sm font-medium" style={{ color: COLORS.secondary }}>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-2 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg">
+              <Icon size={20} className="text-emerald-700" />
+            </div>
+            <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
               {title}
             </p>
           </div>
-          <h3 className="text-3xl font-bold mb-2" style={{ color: COLORS.primary }}>
+          <h3 className="text-4xl font-bold mb-3 bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
             {value?.toLocaleString() || '0'}{suffix}
           </h3>
-          <div className="flex items-center gap-1">
-            {changeType === 'up' ? (
-              <ArrowUpRight size={16} className="text-green-600" />
-            ) : (
-              <ArrowDownRight size={16} className="text-green-600" />
-            )}
-            <span className="text-sm font-semibold text-green-600">
-              {change}%
-            </span>
-            <span className="text-xs text-gray-500 ml-1">vs traditional</span>
+          <div className="flex items-center gap-2">
+            <div className={`flex items-center gap-1 px-3 py-1 rounded-full ${
+              changeType === 'down' ? 'bg-green-50' : 'bg-emerald-50'
+            }`}>
+              {changeType === 'up' ? (
+                <ArrowUpRight size={14} className="text-emerald-600" />
+              ) : (
+                <ArrowDownRight size={14} className="text-green-600" />
+              )}
+              <span className={`text-sm font-bold ${
+                changeType === 'down' ? 'text-green-600' : 'text-emerald-600'
+              }`}>
+                {change}%
+              </span>
+            </div>
+            <span className="text-xs text-gray-500">vs traditional</span>
           </div>
         </div>
       </div>
@@ -136,13 +133,12 @@ const AnalyticsImpact = () => {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border"
-             style={{ borderColor: COLORS.accent }}>
-          <p className="font-semibold mb-2" style={{ color: COLORS.primary }}>
+        <div className="bg-white/95 backdrop-blur-sm p-4 rounded-xl shadow-lg border-2 border-emerald-200">
+          <p className="font-bold text-emerald-800 mb-2">
             {label}
           </p>
           {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
+            <p key={index} className="text-sm font-medium" style={{ color: entry.color }}>
               {entry.name}: {entry.value?.toLocaleString()}
             </p>
           ))}
@@ -153,368 +149,440 @@ const AnalyticsImpact = () => {
   };
 
   return (
-    <div className="min-h-screen p-6" style={{ backgroundColor: COLORS.beigeLight }}>
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-4xl font-bold mb-2" style={{ color: COLORS.primary }}>
-              Analytics & Impact Dashboard
-            </h1>
-            <p className="text-gray-600">
-              Track performance, cost savings, and environmental impact
-            </p>
+      <header className="bg-white/80 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <img src={logo} alt="WasteWise Logo" className="w-10 h-10 object-contain" />
+            <div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-700 to-teal-700 bg-clip-text text-transparent">
+                WasteWise
+              </h1>
+              <p className="text-xs text-gray-500">Analytics & Impact</p>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <select
-              value={timeRange}
-              onChange={(e) => setTimeRange(e.target.value)}
-              className="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
-              style={{ 
-                borderColor: COLORS.accent,
-                backgroundColor: 'white'
-              }}
-            >
-              <option value="week">Last Week</option>
-              <option value="month">Last Month</option>
-              <option value="quarter">Last Quarter</option>
-              <option value="year">Last Year</option>
-            </select>
-            <button
-              onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-white hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: COLORS.primary }}
-            >
-              <Download size={18} />
-              Export Report
+          <div className="flex items-center space-x-4">
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-900 capitalize">
+                {user?.fullName || 'Official'}
+              </p>
+              <p className="text-xs text-gray-500 capitalize">{user?.role || 'Role'}</p>
+            </div>
+            <button className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full text-white font-semibold text-sm flex items-center justify-center hover:shadow-lg transition-shadow">
+              {user?.fullName?.charAt(0) || 'A'}
             </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Key Impact Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <MetricCard
-          icon={Fuel}
-          title="Fuel Saved"
-          value={impactMetrics.fuelSaved}
-          change={impactMetrics.fuelSavedPercent}
-          changeType="down"
-          suffix=" L"
-        />
-        <MetricCard
-          icon={Wind}
-          title="Emissions Reduced"
-          value={impactMetrics.emissionsReduced}
-          change={impactMetrics.emissionsReducedPercent}
-          changeType="down"
-          suffix=" kg CO₂"
-        />
-        <MetricCard
-          icon={AlertCircle}
-          title="Complaints Reduced"
-          value={impactMetrics.complaintsReduced}
-          change={impactMetrics.complaintsReducedPercent}
-          changeType="down"
-        />
-        <MetricCard
-          icon={DollarSign}
-          title="Cost Savings"
-          value={impactMetrics.costSavings}
-          change={impactMetrics.costSavingsPercent}
-          changeType="up"
-          suffix=" ₹"
-        />
-      </div>
-
-      {/* Waste Trends by Zone */}
-      <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <TrendingUp size={24} style={{ color: COLORS.primary }} />
-            <h2 className="text-2xl font-bold" style={{ color: COLORS.primary }}>
-              Waste Collection Trends
-            </h2>
-          </div>
-          <select
-            value={selectedZone}
-            onChange={(e) => setSelectedZone(e.target.value)}
-            className="px-4 py-2 rounded-lg border focus:outline-none focus:ring-2"
-            style={{ borderColor: COLORS.accent, backgroundColor: 'white' }}
-          >
-            <option value="all">All Zones</option>
-            <option value="zone-a">Zone A</option>
-            <option value="zone-b">Zone B</option>
-            <option value="zone-c">Zone C</option>
-            <option value="zone-d">Zone D</option>
-            <option value="zone-e">Zone E</option>
-          </select>
-        </div>
-
-        <ResponsiveContainer width="100%" height={350}>
-          <AreaChart data={wasteTrendData}>
-            <defs>
-              <linearGradient id="colorTraditional" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={COLORS.danger} stopOpacity={0.3}/>
-                <stop offset="95%" stopColor={COLORS.danger} stopOpacity={0}/>
-              </linearGradient>
-              <linearGradient id="colorSmart" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={COLORS.success} stopOpacity={0.3}/>
-                <stop offset="95%" stopColor={COLORS.success} stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke={COLORS.accent} />
-            <XAxis dataKey="month" stroke={COLORS.secondary} />
-            <YAxis stroke={COLORS.secondary} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Area
-              type="monotone"
-              dataKey="traditional"
-              stroke={COLORS.danger}
-              fillOpacity={1}
-              fill="url(#colorTraditional)"
-              name="Traditional Routing (kg)"
-            />
-            <Area
-              type="monotone"
-              dataKey="smart"
-              stroke={COLORS.success}
-              fillOpacity={1}
-              fill="url(#colorSmart)"
-              name="Smart Routing (kg)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* Cost Comparison */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <DollarSign size={24} style={{ color: COLORS.primary }} />
-            <h2 className="text-2xl font-bold" style={{ color: COLORS.primary }}>
-              Cost Comparison Analysis
-            </h2>
-          </div>
-
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={costComparisonData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={COLORS.accent} />
-              <XAxis dataKey="category" stroke={COLORS.secondary} />
-              <YAxis stroke={COLORS.secondary} />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-              <Bar 
-                dataKey="traditional" 
-                fill={COLORS.danger} 
-                name="Traditional Routing (₹)"
-                radius={[8, 8, 0, 0]}
-              />
-              <Bar 
-                dataKey="smart" 
-                fill={COLORS.success} 
-                name="Smart Routing (₹)"
-                radius={[8, 8, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-
-          <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: COLORS.beigeLight }}>
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium" style={{ color: COLORS.secondary }}>
-                Total Monthly Savings
-              </span>
-              <span className="text-2xl font-bold" style={{ color: COLORS.success }}>
-                ₹{impactMetrics.costSavings?.toLocaleString() || '0'}
-              </span>
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Page Title Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-sm font-semibold text-emerald-700 uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Sparkles size={16} />
+                Performance Analytics
+              </p>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                Impact Dashboard
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Track performance, cost savings, and environmental impact in real-time
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                className="px-4 py-2.5 rounded-xl border-2 border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white font-medium text-gray-700 transition-all"
+              >
+                <option value="week">Last Week</option>
+                <option value="month">Last Month</option>
+                <option value="quarter">Last Quarter</option>
+                <option value="year">Last Year</option>
+              </select>
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
+              >
+                <Download size={18} />
+                Export Report
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Emissions Reduction */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Leaf size={24} style={{ color: COLORS.primary }} />
-            <h2 className="text-2xl font-bold" style={{ color: COLORS.primary }}>
-              Environmental Impact
-            </h2>
+        {/* Key Impact Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <MetricCard
+            icon={Fuel}
+            title="Fuel Saved"
+            value={impactMetrics.fuelSaved}
+            change={impactMetrics.fuelSavedPercent}
+            changeType="down"
+            suffix=" L"
+          />
+          <MetricCard
+            icon={Wind}
+            title="Emissions Reduced"
+            value={impactMetrics.emissionsReduced}
+            change={impactMetrics.emissionsReducedPercent}
+            changeType="down"
+            suffix=" kg CO₂"
+          />
+          <MetricCard
+            icon={AlertCircle}
+            title="Complaints Reduced"
+            value={impactMetrics.complaintsReduced}
+            change={impactMetrics.complaintsReducedPercent}
+            changeType="down"
+          />
+          <MetricCard
+            icon={DollarSign}
+            title="Cost Savings"
+            value={impactMetrics.costSavings}
+            change={impactMetrics.costSavingsPercent}
+            changeType="up"
+            suffix=" ₹"
+          />
+        </div>
+
+        {/* Waste Trends by Zone */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-emerald-100">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl">
+                <TrendingUp size={24} className="text-emerald-700" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Waste Collection Trends
+                </h2>
+                <p className="text-sm text-gray-500">Compare traditional vs smart routing efficiency</p>
+              </div>
+            </div>
+            <select
+              value={selectedZone}
+              onChange={(e) => setSelectedZone(e.target.value)}
+              className="px-4 py-2.5 rounded-xl border-2 border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white font-medium text-gray-700"
+            >
+              <option value="all">All Zones</option>
+              <option value="zone-a">Zone A</option>
+              <option value="zone-b">Zone B</option>
+              <option value="zone-c">Zone C</option>
+              <option value="zone-d">Zone D</option>
+              <option value="zone-e">Zone E</option>
+            </select>
           </div>
 
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={emissionsData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={COLORS.accent} />
-              <XAxis dataKey="month" stroke={COLORS.secondary} />
-              <YAxis stroke={COLORS.secondary} />
+          <ResponsiveContainer width="100%" height={350}>
+            <AreaChart data={wasteTrendData}>
+              <defs>
+                <linearGradient id="colorTraditional" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                </linearGradient>
+                <linearGradient id="colorSmart" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
+              <XAxis dataKey="month" stroke="#6b7280" />
+              <YAxis stroke="#6b7280" />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Line
+              <Area
                 type="monotone"
                 dataKey="traditional"
-                stroke={COLORS.danger}
-                strokeWidth={3}
-                name="Traditional (kg CO₂)"
-                dot={{ fill: COLORS.danger, r: 5 }}
+                stroke="#ef4444"
+                fillOpacity={1}
+                fill="url(#colorTraditional)"
+                name="Traditional Routing (kg)"
+                strokeWidth={2}
               />
-              <Line
+              <Area
                 type="monotone"
                 dataKey="smart"
-                stroke={COLORS.success}
-                strokeWidth={3}
-                name="Smart Routing (kg CO₂)"
-                dot={{ fill: COLORS.success, r: 5 }}
+                stroke="#10b981"
+                fillOpacity={1}
+                fill="url(#colorSmart)"
+                name="Smart Routing (kg)"
+                strokeWidth={2}
               />
-            </LineChart>
+            </AreaChart>
           </ResponsiveContainer>
+        </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg" style={{ backgroundColor: COLORS.beigeLight }}>
-              <p className="text-sm mb-1" style={{ color: COLORS.secondary }}>
-                Trees Equivalent
-              </p>
-              <p className="text-xl font-bold" style={{ color: COLORS.success }}>
-                {Math.round((impactMetrics.emissionsReduced || 0) / 21)} trees/year
-              </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Cost Comparison */}
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-emerald-100">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl">
+                <DollarSign size={24} className="text-emerald-700" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Cost Comparison Analysis
+                </h2>
+                <p className="text-sm text-gray-500">Monthly operational expenses</p>
+              </div>
             </div>
-            <div className="p-4 rounded-lg" style={{ backgroundColor: COLORS.beigeLight }}>
-              <p className="text-sm mb-1" style={{ color: COLORS.secondary }}>
-                Carbon Offset
-              </p>
-              <p className="text-xl font-bold" style={{ color: COLORS.success }}>
-                {impactMetrics.emissionsReduced?.toLocaleString() || '0'} kg CO₂
-              </p>
+
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={costComparisonData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
+                <XAxis dataKey="category" stroke="#6b7280" />
+                <YAxis stroke="#6b7280" />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Bar 
+                  dataKey="traditional" 
+                  fill="#ef4444" 
+                  name="Traditional Routing (₹)"
+                  radius={[8, 8, 0, 0]}
+                />
+                <Bar 
+                  dataKey="smart" 
+                  fill="#10b981" 
+                  name="Smart Routing (₹)"
+                  radius={[8, 8, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+
+            <div className="mt-6 p-5 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    Total Monthly Savings
+                  </span>
+                  <p className="text-xs text-gray-500 mt-1">Compared to traditional methods</p>
+                </div>
+                <span className="text-3xl font-bold text-emerald-700">
+                  ₹{impactMetrics.costSavings?.toLocaleString() || '0'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Emissions Reduction */}
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-emerald-100">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl">
+                <Leaf size={24} className="text-emerald-700" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Environmental Impact
+                </h2>
+                <p className="text-sm text-gray-500">Carbon emissions tracking</p>
+              </div>
+            </div>
+
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={emissionsData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
+                <XAxis dataKey="month" stroke="#6b7280" />
+                <YAxis stroke="#6b7280" />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="traditional"
+                  stroke="#ef4444"
+                  strokeWidth={3}
+                  name="Traditional (kg CO₂)"
+                  dot={{ fill: '#ef4444', r: 5 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="smart"
+                  stroke="#10b981"
+                  strokeWidth={3}
+                  name="Smart Routing (kg CO₂)"
+                  dot={{ fill: '#10b981', r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50">
+                <p className="text-sm text-gray-600 mb-1 font-medium">
+                  Trees Equivalent
+                </p>
+                <p className="text-2xl font-bold text-emerald-700">
+                  {Math.round((impactMetrics.emissionsReduced || 0) / 21)} trees/year
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50">
+                <p className="text-sm text-gray-600 mb-1 font-medium">
+                  Carbon Offset
+                </p>
+                <p className="text-2xl font-bold text-emerald-700">
+                  {impactMetrics.emissionsReduced?.toLocaleString() || '0'} kg
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Zone Performance Table */}
-      <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-        <div className="flex items-center gap-3 mb-6">
-          <MapPin size={24} style={{ color: COLORS.primary }} />
-          <h2 className="text-2xl font-bold" style={{ color: COLORS.primary }}>
-            Zone Performance Overview
-          </h2>
-        </div>
+        {/* Zone Performance Table */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-emerald-100">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl">
+              <MapPin size={24} className="text-emerald-700" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                Zone Performance Overview
+              </h2>
+              <p className="text-sm text-gray-500">Efficiency metrics by zone</p>
+            </div>
+          </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr style={{ backgroundColor: COLORS.beigeLight }}>
-                <th className="px-6 py-3 text-left text-sm font-semibold"
-                    style={{ color: COLORS.primary }}>
-                  Zone
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold"
-                    style={{ color: COLORS.primary }}>
-                  Efficiency
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold"
-                    style={{ color: COLORS.primary }}>
-                  Complaints
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold"
-                    style={{ color: COLORS.primary }}>
-                  Waste Collected (kg)
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold"
-                    style={{ color: COLORS.primary }}>
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {zonePerformanceData.map((zone, index) => (
-                <tr key={index} className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 font-medium" style={{ color: COLORS.primary }}>
-                    {zone.zone}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${zone.efficiency}%`,
-                            backgroundColor: zone.efficiency >= 90 ? COLORS.success : COLORS.warning
-                          }}
-                        />
-                      </div>
-                      <span className="text-sm font-semibold">
-                        {zone.efficiency}%
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      zone.complaints <= 5 ? 'bg-green-100 text-green-700' :
-                      zone.complaints <= 10 ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {zone.complaints}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4" style={{ color: COLORS.secondary }}>
-                    {zone.waste?.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      zone.efficiency >= 90 ? 'bg-green-100 text-green-700' :
-                      zone.efficiency >= 85 ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-red-100 text-red-700'
-                    }`}>
-                      {zone.efficiency >= 90 ? 'Excellent' :
-                       zone.efficiency >= 85 ? 'Good' : 'Needs Attention'}
-                    </span>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gradient-to-r from-emerald-50 to-teal-50">
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wide">
+                    Zone
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wide">
+                    Efficiency
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wide">
+                    Complaints
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wide">
+                    Waste Collected
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wide">
+                    Status
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Key Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-md p-6 border-l-4"
-             style={{ borderLeftColor: COLORS.success }}>
-          <Target size={24} className="mb-3" style={{ color: COLORS.success }} />
-          <h3 className="font-bold mb-2" style={{ color: COLORS.primary }}>
-            Performance Goal
-          </h3>
-          <p className="text-sm text-gray-600 mb-2">
-            90% average efficiency across all zones
-          </p>
-          <div className="text-2xl font-bold" style={{ color: COLORS.success }}>
-            Target {impactMetrics.avgEfficiency >= 90 ? 'Met' : 'In Progress'}
+              </thead>
+              <tbody>
+                {zonePerformanceData.map((zone, index) => (
+                  <tr key={index} className="border-b border-gray-100 hover:bg-emerald-50/30 transition-colors">
+                    <td className="px-6 py-5 font-bold text-gray-900">
+                      {zone.zone}
+                    </td>
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-32 h-3 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-300"
+                            style={{
+                              width: `${zone.efficiency}%`,
+                              background: zone.efficiency >= 90 
+                                ? 'linear-gradient(to right, #10b981, #059669)' 
+                                : 'linear-gradient(to right, #f59e0b, #d97706)'
+                            }}
+                          />
+                        </div>
+                        <span className="text-sm font-bold text-gray-900">
+                          {zone.efficiency}%
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className={`px-4 py-1.5 rounded-full text-sm font-bold ${
+                        zone.complaints <= 5 ? 'bg-green-100 text-green-700' :
+                        zone.complaints <= 10 ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {zone.complaints}
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 text-gray-700 font-semibold">
+                      {zone.waste?.toLocaleString()} kg
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className={`px-4 py-1.5 rounded-full text-sm font-bold ${
+                        zone.efficiency >= 90 ? 'bg-emerald-100 text-emerald-700' :
+                        zone.efficiency >= 85 ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {zone.efficiency >= 90 ? '✓ Excellent' :
+                         zone.efficiency >= 85 ? '⚠ Good' : '✗ Needs Attention'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6 border-l-4"
-             style={{ borderLeftColor: COLORS.warning }}>
-          <AlertCircle size={24} className="mb-3" style={{ color: COLORS.warning }} />
-          <h3 className="font-bold mb-2" style={{ color: COLORS.primary }}>
-            Area of Concern
-          </h3>
-          <p className="text-sm text-gray-600 mb-2">
-            Zones with efficiency below 85%
-          </p>
-          <div className="text-2xl font-bold" style={{ color: COLORS.warning }}>
-            {zonePerformanceData.filter(z => z.efficiency < 85).length} Zones
+        {/* Key Insights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-emerald-500 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2.5 bg-emerald-100 rounded-lg">
+                <Target size={24} className="text-emerald-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 text-lg">
+                Performance Goal
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+              90% average efficiency across all zones
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="text-3xl font-bold text-emerald-600">
+                {impactMetrics.avgEfficiency >= 90 ? '✓' : '◷'}
+              </div>
+              <div className="text-xl font-bold text-gray-900">
+                {impactMetrics.avgEfficiency >= 90 ? 'Target Met' : 'In Progress'}
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6 border-l-4"
-             style={{ borderLeftColor: COLORS.primary }}>
-          <TrendingUp size={24} className="mb-3" style={{ color: COLORS.primary }} />
-          <h3 className="font-bold mb-2" style={{ color: COLORS.primary }}>
-            Monthly Trend
-          </h3>
-          <p className="text-sm text-gray-600 mb-2">
-            Improvement in all metrics
-          </p>
-          <div className="text-2xl font-bold" style={{ color: COLORS.success }}>
-            +{impactMetrics.overallImprovement || 15}%
+          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-amber-500 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2.5 bg-amber-100 rounded-lg">
+                <AlertCircle size={24} className="text-amber-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 text-lg">
+                Area of Concern
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+              Zones with efficiency below 85%
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="text-3xl font-bold text-amber-600">
+                {zonePerformanceData.filter(z => z.efficiency < 85).length}
+              </div>
+              <div className="text-xl font-bold text-gray-900">
+                Zone{zonePerformanceData.filter(z => z.efficiency < 85).length !== 1 ? 's' : ''}
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-teal-500 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2.5 bg-teal-100 rounded-lg">
+                <TrendingUp size={24} className="text-teal-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 text-lg">
+                Monthly Trend
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-3 leading-relaxed">
+              Improvement in all metrics
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="text-3xl font-bold text-teal-600">
+                ↑
+              </div>
+              <div className="text-xl font-bold text-gray-900">
+                +{impactMetrics.overallImprovement || 15}%
+              </div>
+            </div>
           </div>
         </div>
       </div>

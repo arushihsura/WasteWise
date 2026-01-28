@@ -4,7 +4,7 @@ import logo from './assets/logo.png'
 const API_BASE_URL = 'http://localhost:3000/api'
 
 export default function RoutesOperations() {
-  const [selectedCity, setSelectedCity] = useState('pune')
+  const [selectedCity, setSelectedCity] = useState('navimumbai')
   const [festivalMode, setFestivalMode] = useState(false)
   const [user, setUser] = useState(null)
   const [routesData, setRoutesData] = useState(null)
@@ -128,7 +128,7 @@ export default function RoutesOperations() {
               onChange={(e) => setSelectedCity(e.target.value)}
               className="w-full px-4 py-2 border-2 border-emerald-200 rounded-lg focus:outline-none focus:border-emerald-500 font-medium"
             >
-              <option value="pune">Pune</option>
+              <option value="navimumbai">Navi Mumbai</option>
               <option value="indore">Indore</option>
               <option value="surat">Surat</option>
             </select>

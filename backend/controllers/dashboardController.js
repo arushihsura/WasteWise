@@ -5,7 +5,7 @@ const getDashboardStats = async (req, res) => {
   try {
     const { city } = req.params
 
-    if (!['pune', 'indore', 'surat'].includes(city)) {
+    if (!['navimumbai', 'indore', 'surat'].includes(city)) {
       return res.status(400).json({ success: false, message: 'Invalid city' })
     }
 
@@ -26,8 +26,8 @@ const getDashboardStats = async (req, res) => {
 
     // Get city-specific data
     const cityData = {
-      pune: {
-        name: 'Pune',
+      navimumbai: {
+        name: 'Navi Mumbai',
         zones: ['Market', 'Residential'],
         festivalImpact: 1.6,
       },

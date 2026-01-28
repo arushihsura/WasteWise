@@ -6,7 +6,7 @@ const getRoutes = async (req, res) => {
     const { city } = req.params
     const festivalMode = req.query.festival === 'true'
 
-    if (!['pune', 'indore', 'surat'].includes(city)) {
+    if (!['navimumbai', 'indore', 'surat'].includes(city)) {
       return res.status(400).json({ success: false, message: 'Invalid city' })
     }
 
@@ -16,7 +16,7 @@ const getRoutes = async (req, res) => {
     // If no trucks found, create default trucks for the city
     if (trucks.length === 0) {
       const defaultTrucks = {
-        pune: [
+        navimumbai: [
           { truckNumber: 1, name: 'Truck 1', zone: 'Market Zone', color: 'from-blue-400 to-blue-600', baseDistance: 12.5, baseTime: '45 mins' },
           { truckNumber: 2, name: 'Truck 2', zone: 'Residential Zone', color: 'from-emerald-400 to-emerald-600', baseDistance: 8.3, baseTime: '35 mins' },
         ],
@@ -108,7 +108,7 @@ const getRoutes = async (req, res) => {
 
     // City-specific explanations
     const explanations = {
-      pune: 'Route optimization prioritizes Market Zone bins which have higher fill levels due to increased commercial activity. Residential areas with lower accumulation are scheduled for lower priority to maximize collection efficiency.',
+      navimumbai: 'Route optimization prioritizes Market Zone bins which have higher fill levels due to increased commercial activity. Residential areas with lower accumulation are scheduled for lower priority to maximize collection efficiency.',
       indore: 'Industrial zone receives priority due to consistent high waste generation. Commercial areas are scheduled for peak efficiency. Route planning avoids congested areas during business hours.',
       surat: 'Textile industry generates significant waste requiring priority scheduling. Coastal residential areas have moderate accumulation. Route timing avoids peak traffic in mill districts.',
     }
