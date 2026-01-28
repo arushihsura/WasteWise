@@ -4,6 +4,7 @@ import SignIn from './SignIn'
 import SignUp from './SignUp'
 import Dashboard from './Dashboard'
 import RoutesOperations from './RoutesOperations'
+import SupervisorMonitor from './pages/SupervisorMonitor'
 import './index.css'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/routes" element={<RoutesOperations />} />
+        <Route path="/supervisor-monitor" element={<SupervisorMonitor />} />
       </Routes>
     </Router>
   )
