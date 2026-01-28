@@ -36,8 +36,8 @@ export default function SignIn() {
       alert('Sign in successful!');
       console.log('User:', data.data.user);
       
-      // TODO: Navigate to dashboard
-      // navigate('/dashboard')
+      // Navigate to dashboard
+      navigate('/dashboard');
       
       setLoading(false);
     } catch (error) {
