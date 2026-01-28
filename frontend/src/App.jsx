@@ -3,6 +3,7 @@ import Landing from './Landing'
 import SignIn from './SignIn'
 import SignUp from './SignUp'
 import SupervisorMonitor from './pages/SupervisorMonitor'
+import AnalyticsImpact from './pages/AnalyticsImpact'
 import './index.css'
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/supervisor-monitor" element={<SupervisorMonitor />} />
+        <Route path="/analytics-impact" element={<AnalyticsImpact />} />
       </Routes>
     </Router>
   )
