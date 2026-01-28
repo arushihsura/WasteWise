@@ -1,0 +1,27 @@
+{
+  "Pune": {
+    "type": "metro",
+    "zones": [
+      { "name": "Market", "wasteGrowth": 1.4, "cost": 12000 },
+      { "name": "Residential", "wasteGrowth": 0.8, "cost": 7000 }
+    ],
+    "festivalImpact": 1.6
+  },
+
+  "Indore": {
+    "type": "metro",
+    "zones": [
+      { "name": "Commercial", "wasteGrowth": 1.1, "cost": 9000 },
+      { "name": "Industrial", "wasteGrowth": 1.5, "cost": 13000 }
+    ],
+    "swachhRankBoost": true
+  },
+
+  "Surat": {
+    "type": "coastal",
+    "zones": [
+      { "name": "Textile", "wasteGrowth": 1.6, "cost": 14000 },
+      { "name": "Residential", "wasteGrowth": 0.9, "cost": 8000 }
+    ]
+  }
+}
